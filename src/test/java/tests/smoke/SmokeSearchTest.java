@@ -33,6 +33,9 @@ public class SmokeSearchTest extends BaseTest {
         assertTrue(page.locator("div.page-title").innerText().toLowerCase().contains("search"),
                 "Должен быть заголовок страницы поиска");
 
+        //page.addStyleTag(new Page.AddStyleTagOptions()
+        //        .setContent("body { filter: grayscale(1) !important; }"));
+
         utils.VisualAssert.assertPageScreenshot(page, "home_search_results");
     }
 }
