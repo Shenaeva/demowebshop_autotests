@@ -11,7 +11,7 @@ public class PlaywrightFactory {
         if (browser == null) {
             playwright = Playwright.create();
             browser = playwright.chromium().launch(
-                    new BrowserType.LaunchOptions().setHeadless(TestConfig.headless())
+                    new BrowserType.LaunchOptions().setHeadless(false)
             );
         }
         return browser;
