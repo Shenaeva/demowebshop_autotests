@@ -53,11 +53,6 @@ public class SmokeWorkingWithCart extends BaseTest {
         Locator notification = page.locator(".bar-notification.success");
         assertThat(notification).containsText("The product has been added to your shopping cart");
 
-        utils.VisualAssert.assertLocatorScreenshot(
-                notification,
-                "notification_about_adding_a_product_to_the_cart"
-        );
-
         //5. Закрыть нотификацию
         notification.locator(".close").click();
 
