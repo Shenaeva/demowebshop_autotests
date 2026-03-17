@@ -1,0 +1,132 @@
+name: UI Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: 'JUnit5 tags expression, e.g. smoke, cart, smoke&cart'
+        required: false
+        default: 'smoke'
+        type: string
+      excluded_tags:
+        description: 'Tags to exclude, e.g. flaky or e2e'
+        required: false
+        default: ''
+        type: string
+      browser:
+        description: 'Playwright browser'
+        required: false
+        default: 'chromium'
+        type: choice
+        options:
+          - chromium
+          - firefox
+          - webkit
+      headless:
+        description: 'Run in headless mode'
+        required: false
+        default: true
+        type: boolean
+
+  schedule:
+    # каждый день в 06:00 UTC
+    - cron: '0 6 * * *'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    env:
+      DEMO_USER_EMAIL: ${{ secrets.DEMO_USER_EMAIL }}
+      DEMO_USER_PASSWORD: ${{ secrets.DEMO_USER_PASSWORD }}
+
+      # значения по умолчанию для schedule
+      DEFAULT_TAGS: smoke
+      DEFAULT_EXCLUDED_TAGS: ""
+      DEFAULT_BROWSER: chromium
+      DEFAULT_HEADLESS: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Show Java and Maven versions
+        run: |
+          java -version
+          mvn -version
+
+      - name: Install Playwright browsers and Linux dependencies
+        run: |
+          mvn -q exec:java -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps"
+
+      - name: Run tests
+        run: |
+          TAGS="${{ github.event.inputs.tags }}"
+          EXCLUDED_TAGS="${{ github.event.inputs.excluded_tags }}"
+          BROWSER="${{ github.event.inputs.browser }}"
+          HEADLESS="${{ github.event.inputs.headless }}"
+
+          if [ -z "$TAGS" ]; then TAGS="$DEFAULT_TAGS"; fi
+          if [ -z "$EXCLUDED_TAGS" ]; then EXCLUDED_TAGS="$DEFAULT_EXCLUDED_TAGS"; fi
+          if [ -z "$BROWSER" ]; then BROWSER="$DEFAULT_BROWSER"; fi
+          if [ -z "$HEADLESS" ]; then HEADLESS="$DEFAULT_HEADLESS"; fi
+
+          echo "TAGS=$TAGS"
+          echo "EXCLUDED_TAGS=$EXCLUDED_TAGS"
+          echo "BROWSER=$BROWSER"
+          echo "HEADLESS=$HEADLESS"
+
+          mvn -B clean test \
+            -Dgroups="$TAGS" \
+            -DexcludedGroups="$EXCLUDED_TAGS" \
+            -Dbrowser="$BROWSER" \
+            -Dheadless="$HEADLESS"
+
+      - name: Generate Allure HTML report
+        if: always()
+        run: |
+          mvn -B allure:report
+
+      - name: Upload Surefire reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: target/surefire-reports/**
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results
+          path: target/allure-results/**
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Upload Allure HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-html-report
+          path: target/site/allure-maven/**
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Upload screenshots and other artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-artifacts
+          path: artifacts/**
+          if-no-files-found: ignore
+          retention-days: 7
