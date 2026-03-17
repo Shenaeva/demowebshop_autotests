@@ -24,8 +24,6 @@
              mvn test -Dgroups="smoke&cart"
              mvn test -DexcludedGroups=e2e
         -->
-        <groups></groups>
-        <excludedGroups></excludedGroups>
     </properties>
 
     <dependencies>
@@ -61,9 +59,15 @@
 
         <dependency>
             <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.5.13</version>
-            <scope>test</scope>
+            <artifactId>logback-core</artifactId>
+            <version>1.5.25</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>dotenv-java</artifactId>
+            <version>3.0.0</version>
         </dependency>
     </dependencies>
 
@@ -77,10 +81,6 @@
                 <version>3.2.5</version>
                 <configuration>
                     <useModulePath>false</useModulePath>
-
-                    <!-- tag expressions -->
-                    <groups>${groups}</groups>
-                    <excludedGroups>${excludedGroups}</excludedGroups>
 
                     <!-- Optional: show more readable output -->
                     <printSummary>true</printSummary>

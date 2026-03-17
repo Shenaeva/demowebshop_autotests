@@ -14,14 +14,13 @@ import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertTha
 @RunTags.Smoke
 @FeatureTags.Cart
 
-public class SmokeWorkingWithCart extends BaseTest {
+public class SmokeWorkingWithCartTest extends BaseTest {
 
     @Test
     void going_ToAnEmptyCart() {
         // 1. Главная уже открыта
 
         // 2. Проверить, что корзина обозначена пустой, 0 добавленных товаров
-        //String text = page.locator(".cart-qty").innerText();
         assertThat(page.locator(".cart-qty")).containsText("(0)");
 
         // 3. Перейти в корзину
@@ -61,6 +60,8 @@ public class SmokeWorkingWithCart extends BaseTest {
 
         // 6. Перейти в корзину
         page.locator(".ico-cart").first().click();
+        //assertThat(page).hasURL("**/cart");
+        assertThat(page.locator(".page-title")).containsText("Shopping cart");
 
         // 7. Проверить корзину визуально
         stabilizeForScreenshot();
@@ -71,7 +72,11 @@ public class SmokeWorkingWithCart extends BaseTest {
     private void stabilizeForScreenshot() {
         page.evaluate("() => window.scrollTo(0, 0)");
         page.addStyleTag(new Page.AddStyleTagOptions().setContent(
-                "* { transition: none !important; animation: none !important; }"
+                "* { transition: none !important; animation: none !important; }" +
+                        ".mini-shopping-cart, .flyout-cart { display: none !important; }"
         ));
+
+        page.mouse().move(60, 500);
+        page.locator("body").click(new Locator.ClickOptions().setPosition(100, 500));
     }
 }
