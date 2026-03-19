@@ -1,7 +1,6 @@
 package core;
 
 import com.microsoft.playwright.*;
-import config.TestConfig;
 
 public class PlaywrightFactory {
     private static Playwright playwright;
@@ -10,9 +9,18 @@ public class PlaywrightFactory {
     public static Browser getBrowser() {
         if (browser == null) {
             playwright = Playwright.create();
-            browser = playwright.chromium().launch(
-                    new BrowserType.LaunchOptions().setHeadless(false)
-            );
+
+            String browserName = System.getProperty("browser", "chromium").toLowerCase();
+            boolean headless = Boolean.parseBoolean(System.getProperty("headless", "true"));
+
+            BrowserType.LaunchOptions options = new BrowserType.LaunchOptions()
+                    .setHeadless(headless);
+
+            browser = switch (browserName) {
+                case "firefox" -> playwright.firefox().launch(options);
+                case "webkit" -> playwright.webkit().launch(options);
+                default -> playwright.chromium().launch(options);
+            };
         }
         return browser;
     }
