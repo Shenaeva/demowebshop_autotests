@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @RunTags.UI
 @RunTags.Smoke
 @FeatureTags.Catalog
-public class SmokeTransitionToCategory extends BaseTest {
+public class SmokeTransitionToCategoryTest extends BaseTest {
 
     @Test
     void transition_ToCategoryIsInProgress() {
