@@ -37,7 +37,7 @@ public class SmokeTransitionToCategory extends BaseTest {
         ));
 
         // 6) Визуальная проверка
-        utils.VisualAssert.assertPageScreenshot(page, "transition_to_books_catalog");
+        utils.VisualAssert.assertPageScreenshot(page, "transition_to_books_catalog_test");
     }
 
     @Test
@@ -53,7 +53,7 @@ public class SmokeTransitionToCategory extends BaseTest {
         assertEquals("Electronics", titleElectronics.innerText().trim());
 
         stabilizeForScreenshot();
-        utils.VisualAssert.assertPageScreenshot(page, "transition_to_electronics_catalog");
+        utils.VisualAssert.assertPageScreenshot(page, "transition_to_electronics_catalog_test");
 
         // 4) Нажать на "Camera, photo"
         page.locator("a[href='/camera-photo']").first().click();
@@ -64,7 +64,7 @@ public class SmokeTransitionToCategory extends BaseTest {
         assertEquals("Camera, photo", titleCamera.innerText().trim());
 
         stabilizeForScreenshot();
-        utils.VisualAssert.assertPageScreenshot(page, "transition_to_camera_catalog");
+        utils.VisualAssert.assertPageScreenshot(page, "transition_to_camera_catalog_test");
     }
 
     @Test
@@ -80,7 +80,7 @@ public class SmokeTransitionToCategory extends BaseTest {
         assertEquals("Digital downloads", titleDigital.innerText().trim());
 
         stabilizeForScreenshot();
-        utils.VisualAssert.assertPageScreenshot(page, "transition_to_digital_downloads_catalog");
+        utils.VisualAssert.assertPageScreenshot(page, "transition_to_digital_downloads_catalog_test");
 
         // 4) Открыть товар "3rd Album"
         page.locator("a[href='/album-3']").first().click();
@@ -91,7 +91,7 @@ public class SmokeTransitionToCategory extends BaseTest {
         assertTrue(current.innerText().trim().equalsIgnoreCase("3rd Album"));
 
         stabilizeForScreenshot();
-        utils.VisualAssert.assertPageScreenshot(page, "transition_to_3rd_album_product");
+        utils.VisualAssert.assertPageScreenshot(page, "transition_to_3rd_album_product_test");
     }
 
     private void stabilizeForScreenshot() {

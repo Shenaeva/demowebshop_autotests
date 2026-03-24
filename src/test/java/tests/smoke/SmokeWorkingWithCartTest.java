@@ -30,7 +30,7 @@ public class SmokeWorkingWithCartTest extends BaseTest {
         assertThat(page.locator(".order-summary-content")).containsText("Your Shopping Cart is empty!");
 
         stabilizeForScreenshot();
-        utils.VisualAssert.assertPageScreenshot(page, "cart_is_empty");
+        utils.VisualAssert.assertPageScreenshot(page, "cart_is_empty_test");
     }
 
     @Test
@@ -65,7 +65,7 @@ public class SmokeWorkingWithCartTest extends BaseTest {
 
         // 7. Проверить корзину визуально
         stabilizeForScreenshot();
-        utils.VisualAssert.assertPageScreenshot(page, "the_item_has_been_added_to_the_cart");
+        utils.VisualAssert.assertPageScreenshot(page, "the_item_has_been_added_to_the_cart_test");
 
     }
 
