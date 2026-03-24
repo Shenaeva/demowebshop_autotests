@@ -96,7 +96,7 @@ jobs:
             -Dgroups="$TAGS" \
             -DexcludedGroups="$EXCLUDED_TAGS" \
             -Dbrowser="$BROWSER" \
-            -Dheadless="$HEADLESS"
+            -Dheadless="$HEADLESS" \
             -Dvisual.updateBaseline="$UPDATE_BASELINE"
 
       - name: Generate Allure HTML report
