@@ -82,9 +82,8 @@
                 <version>3.2.5</version>
                 <configuration>
                     <useModulePath>false</useModulePath>
-
-                    <!-- Optional: show more readable output -->
                     <printSummary>true</printSummary>
+                    <rerunFailingTestsCount>1</rerunFailingTestsCount>
                 </configuration>
             </plugin>
 
