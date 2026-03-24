@@ -27,6 +27,11 @@ on:
         required: false
         default: true
         type: boolean
+      update_baseline:
+        description: 'Update visual baseline'
+        required: false
+        default: false
+        type: boolean
 
   schedule:
     # каждый день в 06:00 UTC
@@ -73,22 +78,26 @@ jobs:
           EXCLUDED_TAGS="${{ github.event.inputs.excluded_tags }}"
           BROWSER="${{ github.event.inputs.browser }}"
           HEADLESS="${{ github.event.inputs.headless }}"
+          UPDATE_BASELINE="${{ github.event.inputs.update_baseline }}"
 
           if [ -z "$TAGS" ]; then TAGS="$DEFAULT_TAGS"; fi
           if [ -z "$EXCLUDED_TAGS" ]; then EXCLUDED_TAGS="$DEFAULT_EXCLUDED_TAGS"; fi
           if [ -z "$BROWSER" ]; then BROWSER="$DEFAULT_BROWSER"; fi
           if [ -z "$HEADLESS" ]; then HEADLESS="$DEFAULT_HEADLESS"; fi
+          if [ -z "$UPDATE_BASELINE" ]; then UPDATE_BASELINE="false"; fi
 
           echo "TAGS=$TAGS"
           echo "EXCLUDED_TAGS=$EXCLUDED_TAGS"
           echo "BROWSER=$BROWSER"
           echo "HEADLESS=$HEADLESS"
+          echo "UPDATE_BASELINE=$UPDATE_BASELINE"
 
           mvn -B clean test \
             -Dgroups="$TAGS" \
             -DexcludedGroups="$EXCLUDED_TAGS" \
             -Dbrowser="$BROWSER" \
             -Dheadless="$HEADLESS"
+            -Dvisual.updateBaseline="$UPDATE_BASELINE"
 
       - name: Generate Allure HTML report
         if: always()
@@ -129,4 +138,13 @@ jobs:
           name: test-artifacts
           path: artifacts/**
           if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Upload visual baseline
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-baseline
+          path: src/test/resources/visual-baseline/**
+          if-no-files-found: warn
           retention-days: 7
