@@ -8,11 +8,13 @@ on:
         required: false
         default: 'smoke'
         type: string
+
       excluded_tags:
         description: 'Tags to exclude, e.g. flaky or e2e'
         required: false
         default: ''
         type: string
+
       browser:
         description: 'Playwright browser'
         required: false
@@ -22,16 +24,13 @@ on:
           - chromium
           - firefox
           - webkit
-      headless:
-        description: 'Run in headless mode'
-        required: false
-        default: true
-        type: boolean
+
       update_baseline:
         description: 'Update visual baseline'
         required: false
         default: false
         type: boolean
+
       test_name:
         description: 'Optional single test: SmokeSearchTest or SmokeSearchTest#search_returnsResults'
         required: false
@@ -39,7 +38,6 @@ on:
         type: string
 
   schedule:
-    # каждый день в 06:00 UTC
     - cron: '0 6 * * *'
 
 jobs:
@@ -51,11 +49,9 @@ jobs:
       DEMO_USER_EMAIL: ${{ secrets.DEMO_USER_EMAIL }}
       DEMO_USER_PASSWORD: ${{ secrets.DEMO_USER_PASSWORD }}
 
-      # значения по умолчанию для schedule
       DEFAULT_TAGS: smoke
       DEFAULT_EXCLUDED_TAGS: ""
       DEFAULT_BROWSER: chromium
-      DEFAULT_HEADLESS: true
 
     steps:
       - name: Checkout
@@ -77,28 +73,37 @@ jobs:
         run: |
           mvn -q exec:java -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps"
 
+      - name: Prepare run label
+        id: meta
+        shell: bash
+        run: |
+          TEST_NAME="${{ github.event.inputs.test_name }}"
+          if [ -n "$TEST_NAME" ]; then
+            SAFE_NAME=$(echo "$TEST_NAME" | sed 's/#/-/g; s/[^A-Za-z0-9._-]/_/g')
+            echo "artifact_suffix=single-$SAFE_NAME" >> "$GITHUB_OUTPUT"
+          else
+            echo "artifact_suffix=smoke-suite" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Run tests
         run: |
           TAGS="${{ github.event.inputs.tags }}"
           EXCLUDED_TAGS="${{ github.event.inputs.excluded_tags }}"
           BROWSER="${{ github.event.inputs.browser }}"
-          HEADLESS="${{ github.event.inputs.headless }}"
           UPDATE_BASELINE="${{ github.event.inputs.update_baseline }}"
           TEST_NAME="${{ github.event.inputs.test_name }}"
 
           if [ -z "$TAGS" ]; then TAGS="$DEFAULT_TAGS"; fi
           if [ -z "$EXCLUDED_TAGS" ]; then EXCLUDED_TAGS="$DEFAULT_EXCLUDED_TAGS"; fi
           if [ -z "$BROWSER" ]; then BROWSER="$DEFAULT_BROWSER"; fi
-          if [ -z "$HEADLESS" ]; then HEADLESS="$DEFAULT_HEADLESS"; fi
           if [ -z "$UPDATE_BASELINE" ]; then UPDATE_BASELINE="false"; fi
 
           echo "TAGS=$TAGS"
           echo "EXCLUDED_TAGS=$EXCLUDED_TAGS"
           echo "BROWSER=$BROWSER"
-          echo "HEADLESS=$HEADLESS"
           echo "UPDATE_BASELINE=$UPDATE_BASELINE"
           echo "TEST_NAME=$TEST_NAME"
-          
+
           if [ -n "$TEST_NAME" ]; then
             mvn -B clean test \
               -Dtest="$TEST_NAME" \
@@ -116,14 +121,6 @@ jobs:
               -Dsurefire.rerunFailingTestsCount=1
           fi
 
-          mvn -B clean test \
-            -Dgroups="$TAGS" \
-            -DexcludedGroups="$EXCLUDED_TAGS" \
-            -Dbrowser="$BROWSER" \
-            -Dheadless="$HEADLESS" \
-            -Dvisual.updateBaseline="$UPDATE_BASELINE" \
-            -Dsurefire.rerunFailingTestsCount=1
-
       - name: Generate Allure HTML report
         if: always()
         run: |
@@ -133,7 +130,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: surefire-reports
+          name: surefire-${{ steps.meta.outputs.artifact_suffix }}
           path: target/surefire-reports/**
           if-no-files-found: warn
           retention-days: 7
@@ -142,7 +139,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: allure-results
+          name: allure-results-${{ steps.meta.outputs.artifact_suffix }}
           path: target/allure-results/**
           if-no-files-found: warn
           retention-days: 7
@@ -151,7 +148,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: allure-html-report
+          name: allure-html-${{ steps.meta.outputs.artifact_suffix }}
           path: target/site/allure-maven/**
           if-no-files-found: warn
           retention-days: 7
@@ -160,16 +157,16 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-artifacts
+          name: test-artifacts-${{ steps.meta.outputs.artifact_suffix }}
           path: artifacts/**
           if-no-files-found: ignore
           retention-days: 7
 
       - name: Upload visual baseline
-        if: always()
+        if: always() && github.event.inputs.update_baseline == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: visual-baseline
+          name: visual-baseline-${{ steps.meta.outputs.artifact_suffix }}
           path: src/test/resources/visual-baseline/**
           if-no-files-found: warn
           retention-days: 7
