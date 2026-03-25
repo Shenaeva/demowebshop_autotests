@@ -36,6 +36,6 @@ public class SmokeSearchTest extends BaseTest {
         //page.addStyleTag(new Page.AddStyleTagOptions()
         //        .setContent("body { filter: grayscale(1) !important; }"));
 
-        utils.VisualAssert.assertPageScreenshot(page, "home_search_results_test");
+        utils.VisualAssert.assertPageScreenshot(page, "home_search_results_tests");
     }
 }
