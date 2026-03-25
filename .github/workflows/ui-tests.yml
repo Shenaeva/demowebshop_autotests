@@ -32,6 +32,11 @@ on:
         required: false
         default: false
         type: boolean
+      test_name:
+        description: 'Optional single test: SmokeSearchTest or SmokeSearchTest#search_returnsResults'
+        required: false
+        default: ''
+        type: string
 
   schedule:
     # каждый день в 06:00 UTC
@@ -79,6 +84,7 @@ jobs:
           BROWSER="${{ github.event.inputs.browser }}"
           HEADLESS="${{ github.event.inputs.headless }}"
           UPDATE_BASELINE="${{ github.event.inputs.update_baseline }}"
+          TEST_NAME="${{ github.event.inputs.test_name }}"
 
           if [ -z "$TAGS" ]; then TAGS="$DEFAULT_TAGS"; fi
           if [ -z "$EXCLUDED_TAGS" ]; then EXCLUDED_TAGS="$DEFAULT_EXCLUDED_TAGS"; fi
@@ -91,6 +97,24 @@ jobs:
           echo "BROWSER=$BROWSER"
           echo "HEADLESS=$HEADLESS"
           echo "UPDATE_BASELINE=$UPDATE_BASELINE"
+          echo "TEST_NAME=$TEST_NAME"
+          
+          if [ -n "$TEST_NAME" ]; then
+            mvn -B clean test \
+              -Dtest="$TEST_NAME" \
+              -Dbrowser="$BROWSER" \
+              -Dheadless=true \
+              -Dvisual.updateBaseline="$UPDATE_BASELINE" \
+              -Dsurefire.rerunFailingTestsCount=1
+          else
+            mvn -B clean test \
+              -Dgroups="$TAGS" \
+              -DexcludedGroups="$EXCLUDED_TAGS" \
+              -Dbrowser="$BROWSER" \
+              -Dheadless=true \
+              -Dvisual.updateBaseline="$UPDATE_BASELINE" \
+              -Dsurefire.rerunFailingTestsCount=1
+          fi
 
           mvn -B clean test \
             -Dgroups="$TAGS" \
