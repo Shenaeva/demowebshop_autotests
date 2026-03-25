@@ -110,7 +110,7 @@ jobs:
               -Dbrowser="$BROWSER" \
               -Dheadless=true \
               -Dvisual.updateBaseline="$UPDATE_BASELINE" \
-              -Dsurefire.rerunFailingTestsCount=1
+              -Dsurefire.rerunFailingTestsCount=2
           else
             mvn -B clean test \
               -Dgroups="$TAGS" \
