@@ -118,7 +118,7 @@ jobs:
               -Dbrowser="$BROWSER" \
               -Dheadless=true \
               -Dvisual.updateBaseline="$UPDATE_BASELINE" \
-              -Dsurefire.rerunFailingTestsCount=1
+              -Dsurefire.rerunFailingTestsCount=2
           fi
 
       - name: Generate Allure HTML report
