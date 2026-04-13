@@ -2,17 +2,23 @@ package pages;
 
 import com.microsoft.playwright.Page;
 
-public class CartPage {
-    private final Page page;
+public class CartPage extends BasePage {
 
-    public CartPage(Page page) { this.page = page; }
+    private static final String CART_ITEMS = "table.cart tr.cart-item-row";
+    private static final String REMOVE_CHECKBOX = "input[name='removefromcart']";
+    private static final String UPDATE_CART_BUTTON = "input[name='updatecart']";
 
-    public int itemsCount() {
-        return page.locator("table.cart tr.cart-item-row").count();
+    public CartPage(Page page) {
+        super(page);
     }
 
-    public void removeFirstItem() {
-        page.locator("input[name='removefromcart']").first().check();
-        page.locator("input[name='updatecart']").click();
+    public int itemsCount() {
+        return locator(CART_ITEMS).count();
+    }
+
+    public CartPage removeFirstItem() {
+        locator(REMOVE_CHECKBOX).first().check();
+        click(UPDATE_CART_BUTTON);
+        return this;
     }
 }

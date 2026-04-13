@@ -2,16 +2,21 @@ package pages;
 
 import com.microsoft.playwright.Page;
 
-public class ProductsPage {
-    private final Page page;
+public class ProductsPage extends BasePage {
 
-    public ProductsPage(Page page) { this.page = page; }
+    private static final String PRODUCT_CARDS = ".product-grid .product-item";
+    private static final String FIRST_PRODUCT_LINK = ".product-grid .product-item h2.product-title a";
 
-    public void openFirstProductFromGrid() {
-        page.locator(".product-grid .product-item h2.product-title a").first().click();
+    public ProductsPage(Page page) {
+        super(page);
+    }
+
+    public ProductPage openFirstProductFromGrid() {
+        click(FIRST_PRODUCT_LINK);
+        return new ProductPage(page);
     }
 
     public int resultsCount() {
-        return page.locator(".product-grid .product-item").count();
+        return locator(PRODUCT_CARDS).count();
     }
 }

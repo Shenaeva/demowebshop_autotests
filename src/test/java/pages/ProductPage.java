@@ -2,20 +2,34 @@ package pages;
 
 import com.microsoft.playwright.Page;
 
-public class ProductPage {
-    private final Page page;
+public class ProductPage extends BasePage {
 
-    public ProductPage(Page page) { this.page = page; }
+    private static final String PRODUCT_NAME = "div.product-name h1";
+    private static final String ADD_TO_CART_BUTTON = "input[value='Add to cart']";
+    private static final String SUCCESS_NOTIFICATION = "div.bar-notification.success";
+    private static final String SUCCESS_NOTIFICATION_CLOSE = "div.bar-notification.success span.close";
 
-    public String title() {
-        return page.locator("div.product-name h1").innerText();
+    public ProductPage(Page page) {
+        super(page);
     }
 
-    public void addToCart() {
-        page.locator("input[value='Add to cart']").first().click();
-        // ждём, что нотификация появится (Playwright сам ждёт клика, но лучше явно)
-        page.locator("div.bar-notification.success").waitFor();
-        // закрыть уведомление, чтобы не мешало
-        page.locator("div.bar-notification.success span.close").click();
+    public String title() {
+        return text(PRODUCT_NAME);
+    }
+
+    public ProductPage addToCart() {
+        locator(ADD_TO_CART_BUTTON).first().click();
+        locator(SUCCESS_NOTIFICATION).waitFor();
+        return this;
+    }
+
+    public boolean isSuccessNotificationVisible() {
+        return isVisible(SUCCESS_NOTIFICATION);
+    }
+
+    public void closeSuccessNotification() {
+        if (isVisible(SUCCESS_NOTIFICATION_CLOSE)) {
+            click(SUCCESS_NOTIFICATION_CLOSE);
+        }
     }
 }

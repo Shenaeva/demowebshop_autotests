@@ -1,28 +1,65 @@
 package pages;
 
+import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 
-public class HomePage {
-    private final Page page;
+public class HomePage extends BasePage {
 
-    public HomePage(Page page) { this.page = page; }
+    private static final String LOGIN_LINK = "a.ico-login";
+    private static final String REGISTER_LINK = "a.ico-register";
+    private static final String SEARCH_INPUT = "#small-searchterms";
+    private static final String SEARCH_BUTTON = "input[value='Search']";
+    private static final String CART_QTY = "span.cart-qty";
+    private static final String CART_LINK = "a.ico-cart";
+    private static final String LOGOUT_LINK = "a.ico-logout";
+    private static final String ACCOUNT_LINK = ".account";
 
-    public void openLogin() {
-        page.locator("a.ico-login").click();
+    public HomePage(Page page) {
+        super(page);
     }
 
-    public void search(String query) {
-        page.locator("input#small-searchterms").fill(query);
-        page.locator("input[value='Search']").click();
+    public LoginPage openLoginPage() {
+        click(LOGIN_LINK);
+        waitForUrlContains("/login");
+        return new LoginPage(page);
+    }
+
+    public RegistrationPage openRegistrationPage() {
+        click(REGISTER_LINK);
+        waitForUrlContains("/register");
+        return new RegistrationPage(page);
+    }
+
+    public ProductsPage search(String query) {
+        fill(SEARCH_INPUT, query);
+        click(SEARCH_BUTTON);
+        return new ProductsPage(page);
     }
 
     public int cartQty() {
-        // "Shopping cart (0)" -> вытаскиваем число
-        String text = page.locator("span.cart-qty").innerText(); // "(0)"
-        return Integer.parseInt(text.replaceAll("[^0-9]", ""));
+        String rawText = text(CART_QTY);
+        return Integer.parseInt(rawText.replaceAll("[^0-9]", ""));
     }
 
-    public void openCart() {
-        page.locator("a.ico-cart").click();
+    public CartPage openCart() {
+        click(CART_LINK);
+        waitForUrlContains("/cart");
+        return new CartPage(page);
+    }
+
+    public void logout() {
+        click(LOGOUT_LINK);
+    }
+
+    public Locator loginLink() {
+        return locator(LOGIN_LINK);
+    }
+
+    public Locator logoutLink() {
+        return locator(LOGOUT_LINK);
+    }
+
+    public Locator accountLink() {
+        return locator(ACCOUNT_LINK);
     }
 }
