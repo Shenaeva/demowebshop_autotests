@@ -1,6 +1,5 @@
 package tests.smoke;
 
-import com.microsoft.playwright.Page;
 import core.BaseTest;
 import core.tags.FeatureTags;
 import core.tags.RunTags;

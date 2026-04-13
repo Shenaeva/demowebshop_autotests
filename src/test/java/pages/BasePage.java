@@ -38,7 +38,7 @@ public abstract class BasePage {
     }
 
     protected void waitForUrlContains(String urlPart) {
-        assertThat(page).hasURL(Pattern.compile(".*" + Pattern.quote(urlPart) + ".*"));
+        page.waitForURL(url -> url.contains(urlPart));
     }
 
     protected void waitForBrowserTitleContains(String titlePart) {
