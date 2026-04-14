@@ -62,4 +62,5 @@ public class HomePage extends BasePage {
     public Locator accountLink() {
         return locator(ACCOUNT_LINK);
     }
+
 }

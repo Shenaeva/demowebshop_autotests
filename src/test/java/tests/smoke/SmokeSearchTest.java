@@ -4,6 +4,9 @@ import core.BaseTest;
 import core.tags.FeatureTags;
 import core.tags.RunTags;
 import org.junit.jupiter.api.Test;
+import pages.HomePage;
+import pages.ProductsPage;
+import utils.VisualAssert;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -11,30 +14,20 @@ import static org.junit.jupiter.api.Assertions.*;
 @RunTags.Smoke
 @FeatureTags.Search
 @FeatureTags.Catalog
+
 public class SmokeSearchTest extends BaseTest {
 
     @Test
     void search_returnsResults() {
-        // 1) в BaseTest уже открыта главная страница
+        HomePage homePage = new HomePage(page);
 
-        // 2) вводим запрос
-        page.locator("input#small-searchterms").fill("computer");
+        ProductsPage productsPage = homePage.search("computer");
 
-        // 3) жмем Search
-        page.locator("input[value='Search']").click();
-
-        // 4) проверяем, что результаты есть
-        int count = page.locator(".product-grid .product-item").count();
-        assertTrue(count > 0, "Ожидали непустые результаты поиска");
-
-        // 5) доп.проверки (не обязательны, но полезны)
-        assertTrue(page.url().contains("search"), "URL должен содержать 'search'");
-        assertTrue(page.locator("div.page-title").innerText().toLowerCase().contains("search"),
+        assertTrue(productsPage.hasResults(), "Ожидали непустые результаты поиска");
+        assertTrue(productsPage.isSearchPageOpened(), "URL должен содержать 'search'");
+        assertTrue(productsPage.titleText().toLowerCase().contains("search"),
                 "Должен быть заголовок страницы поиска");
 
-        //page.addStyleTag(new Page.AddStyleTagOptions()
-        //        .setContent("body { filter: grayscale(1) !important; }"));
-
-        utils.VisualAssert.assertPageScreenshot(page, "home_search_results_tests");
+        VisualAssert.assertPageScreenshot(page, "home_search_results_tests");
     }
 }

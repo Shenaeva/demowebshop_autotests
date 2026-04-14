@@ -2,6 +2,8 @@ package pages;
 
 import com.microsoft.playwright.Page;
 
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+
 public class LoginPage extends BasePage {
 
     private static final String EMAIL_INPUT = "#Email";
@@ -20,7 +22,10 @@ public class LoginPage extends BasePage {
         fill(EMAIL_INPUT, email);
         fill(PASSWORD_INPUT, password);
         click(LOGIN_BUTTON);
-        return new HomePage(page);
+
+        HomePage homePage = new HomePage(page);
+        assertThat(homePage.logoutLink()).isVisible();
+        return homePage;
     }
 
     public boolean hasValidationSummary() {
