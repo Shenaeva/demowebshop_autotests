@@ -20,7 +20,7 @@ public class SmokeAuthorizationTest extends BaseTest {
         HomePage homePage = new HomePage(page);
         LoginPage loginPage = homePage.openLoginPage();
 
-        homePage = loginPage.login(Credentials.email(), Credentials.password());
+        homePage = loginPage.loginAsValidUser(Credentials.email(), Credentials.password());
 
         assertThat(homePage.accountLink()).isVisible();
         assertThat(homePage.logoutLink()).isVisible();

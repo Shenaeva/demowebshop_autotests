@@ -3,6 +3,8 @@ package pages;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+
 public class HomePage extends BasePage {
 
     private static final String LOGIN_LINK = "a.ico-login";
@@ -20,8 +22,7 @@ public class HomePage extends BasePage {
 
     public LoginPage openLoginPage() {
         click(LOGIN_LINK);
-        waitForUrlContains("/login");
-        return new LoginPage(page);
+        return new LoginPage(page).waitUntilOpened();
     }
 
     public RegistrationPage openRegistrationPage() {
@@ -33,6 +34,7 @@ public class HomePage extends BasePage {
     public ProductsPage search(String query) {
         fill(SEARCH_INPUT, query);
         click(SEARCH_BUTTON);
+        page.waitForURL(url -> url.contains("search"));
         return new ProductsPage(page);
     }
 
@@ -43,12 +45,21 @@ public class HomePage extends BasePage {
 
     public CartPage openCart() {
         click(CART_LINK);
-        waitForUrlContains("/cart");
-        return new CartPage(page);
+        return new CartPage(page).waitUntilOpened();
     }
 
-    public void logout() {
+    public HomePage logout() {
         click(LOGOUT_LINK);
+        assertThat(locator(LOGIN_LINK)).isVisible();
+        return this;
+    }
+
+    public boolean isLoggedIn() {
+        return isVisible(LOGOUT_LINK) && isVisible(ACCOUNT_LINK);
+    }
+
+    public boolean isLoggedOut() {
+        return isVisible(LOGIN_LINK);
     }
 
     public Locator loginLink() {
@@ -62,5 +73,4 @@ public class HomePage extends BasePage {
     public Locator accountLink() {
         return locator(ACCOUNT_LINK);
     }
-
 }

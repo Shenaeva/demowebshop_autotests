@@ -6,15 +6,20 @@ public class ProductsPage extends BasePage {
 
     private static final String PRODUCT_CARDS = ".product-grid .product-item";
     private static final String FIRST_PRODUCT_LINK = ".product-grid .product-item h2.product-title a";
-    private static final String PAGE_TITLE = "div.page-title";
+    private static final String PAGE_TITLE = "div.page-title h1";
 
     public ProductsPage(Page page) {
         super(page);
     }
 
+    public ProductsPage waitUntilOpened() {
+        waitForUrlContains("search");
+        return this;
+    }
+
     public ProductPage openFirstProductFromGrid() {
         click(FIRST_PRODUCT_LINK);
-        return new ProductPage(page);
+        return new ProductPage(page).waitUntilOpened();
     }
 
     public boolean isSearchPageOpened() {
@@ -31,5 +36,9 @@ public class ProductsPage extends BasePage {
 
     public String titleText() {
         return text(PAGE_TITLE);
+    }
+
+    public void prepareForScreenshot() {
+        stabilizeForScreenshot();
     }
 }

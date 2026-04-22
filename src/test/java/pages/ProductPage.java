@@ -2,6 +2,8 @@ package pages;
 
 import com.microsoft.playwright.Page;
 
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+
 public class ProductPage extends BasePage {
 
     private static final String PRODUCT_NAME = "div.product-name h1";
@@ -11,6 +13,11 @@ public class ProductPage extends BasePage {
 
     public ProductPage(Page page) {
         super(page);
+    }
+
+    public ProductPage waitUntilOpened() {
+        locator(PRODUCT_NAME).waitFor();
+        return this;
     }
 
     public String title() {
@@ -27,9 +34,11 @@ public class ProductPage extends BasePage {
         return isVisible(SUCCESS_NOTIFICATION);
     }
 
-    public void closeSuccessNotification() {
+    public ProductPage closeSuccessNotification() {
         if (isVisible(SUCCESS_NOTIFICATION_CLOSE)) {
             click(SUCCESS_NOTIFICATION_CLOSE);
+            assertThat(locator(SUCCESS_NOTIFICATION)).not().isVisible();
         }
+        return this;
     }
 }
