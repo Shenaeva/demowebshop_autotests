@@ -5,6 +5,9 @@ import com.microsoft.playwright.Page;
 import core.BaseTest;
 import core.tags.FeatureTags;
 import core.tags.RunTags;
+import pages.HomePage;
+import pages.ProductsPage;
+import pages.ProductPage;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -16,7 +19,8 @@ public class SmokeTransitionToCategoryTest extends BaseTest {
 
     @Test
     void transition_ToCategoryIsInProgress() {
-        // 1) Главная уже открыта
+        HomePage homePage = new HomePage(page);
+
 
         // 2) Клик по Books
         page.locator("ul.top-menu a[href='/books']").click();
